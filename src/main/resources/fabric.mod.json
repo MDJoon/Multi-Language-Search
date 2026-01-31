@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "enitemsearch",
+	"version": "${version}",
+	"name": "enitemsearch",
+	"description": "Search for items in English",
+	"authors": [
+		"MDJoon"
+	],
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.mdjoon.enitemsearch.Enitemsearch"
+		]
+	},
+	"mixins": [
+		"enitemsearch.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}

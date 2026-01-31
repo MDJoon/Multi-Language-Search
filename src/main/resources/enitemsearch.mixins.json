@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.mdjoon.enitemsearch.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ItemSearchMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
