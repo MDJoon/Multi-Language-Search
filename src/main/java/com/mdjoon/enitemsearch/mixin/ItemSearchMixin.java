@@ -5,13 +5,19 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.resource.language.TranslationStorage;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Language;
@@ -35,15 +41,32 @@ public abstract class ItemSearchMixin {
     ) {
         TranslationStorage ts = EnglishLanguageCache.get();if(ts == null) return;
 
-        Item item = ((ItemStack)(Object)this).getItem();
+        ItemStack itemStack = ((ItemStack)(Object)this);
+        Item item = itemStack.getItem();
+
         String key = item.getTranslationKey();
 
         if(!ts.hasTranslation(key)) return;
 
         String en_name = ts.get(key);
 
-
         if (en_name != null) {
+            if(type.isCreative()) {
+                if(itemStack.isOf(Items.ENCHANTED_BOOK)) {
+                    ItemEnchantmentsComponent component = EnchantmentHelper.getEnchantments(itemStack);
+                    List<RegistryEntry<Enchantment>> enchantList = component.getEnchantments().stream().toList();
+                    RegistryEntry<Enchantment> entry = enchantList.getFirst();
+
+                    if(entry.value().description().getContent() instanceof TranslatableTextContent content) {
+                        if(ts.hasTranslation(content.getKey())) {
+                            en_name = ts.get(content.getKey()) + " " +en_name;
+                        }
+
+                    }
+
+                }
+            }
+
             cir.getReturnValue().add(
                     Text.literal(en_name).formatted(Formatting.DARK_GRAY)
             );
