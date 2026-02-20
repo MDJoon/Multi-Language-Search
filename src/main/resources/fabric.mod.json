@@ -7,7 +7,7 @@
 	"authors": [
 		"MDJoon"
 	],
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"com.mdjoon.multi_lang_search.MultiLangSearch"
