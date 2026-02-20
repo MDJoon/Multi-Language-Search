@@ -4,6 +4,7 @@
 	"version": "${version}",
 	"name": "Multi Language Search",
 	"description": "use different languages when you search items",
+	"icon": "assets/multilangsearch/icon.png",
 	"authors": [
 		"MDJoon"
 	],
