@@ -1,20 +1,20 @@
 {
 	"schemaVersion": 1,
-	"id": "enitemsearch",
+	"id": "multi_lang_seach",
 	"version": "${version}",
-	"name": "enitemsearch",
-	"description": "Search for items in English",
+	"name": "Multi Language Search",
+	"description": "use different languages when you search items",
 	"authors": [
 		"MDJoon"
 	],
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"com.mdjoon.enitemsearch.Enitemsearch"
+		"client": [
+			"com.mdjoon.multi_lang_search.MultiLangSearch"
 		]
 	},
 	"mixins": [
-		"enitemsearch.mixins.json"
+		"multilangsearch.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.18.4",
