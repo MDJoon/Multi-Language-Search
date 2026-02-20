@@ -10,7 +10,7 @@ import net.minecraft.resource.SynchronousResourceReloader;
 public class ReloadListener implements SynchronousResourceReloader {
     @Override
     public void reload(ResourceManager manager) {
-        MultiLanguageCache.reload();
         ConfigManager.load();
+        MultiLanguageCache.reload();
     }
 }
