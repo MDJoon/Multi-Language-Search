@@ -3,8 +3,8 @@ package com.mdjoon.multi_lang_search;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +14,6 @@ public class MultiLangSearch implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		ResourceLoader.get(ResourceType.CLIENT_RESOURCES).registerReloader(Identifier.of(MOD_ID), new ReloadListener());
+		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(Identifier.parse(MOD_ID), new ReloadListener());
 	}
 }

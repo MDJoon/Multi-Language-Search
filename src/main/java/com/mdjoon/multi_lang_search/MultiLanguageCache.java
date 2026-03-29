@@ -1,24 +1,22 @@
 package com.mdjoon.multi_lang_search;
 
 import com.mdjoon.multi_lang_search.config.ConfigManager;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.TranslationStorage;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.ClientLanguage;
 
 public class MultiLanguageCache {
-    private static TranslationStorage translationStorage;
+    private static ClientLanguage translationStorage;
 
-    public static TranslationStorage get() {
+    public static ClientLanguage get() {
         return translationStorage;
     }
 
     public static void reload() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null) return;
+        Minecraft client = Minecraft.getInstance();
 
         String lang_code = ConfigManager.get().lang_code;
-        translationStorage = TranslationStorage.load(
+        translationStorage = ClientLanguage.loadFrom(
                 client.getResourceManager(),
                 List.of(lang_code),
                 false

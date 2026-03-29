@@ -2,23 +2,6 @@ package com.mdjoon.multi_lang_search.mixin;
 
 import com.mdjoon.multi_lang_search.MultiLanguageCache;
 import com.mdjoon.multi_lang_search.config.ConfigManager;
-import net.minecraft.client.resource.language.TranslationStorage;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.component.type.PotionContentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.potion.Potion;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Formatting;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,54 +9,71 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 @Mixin(ItemStack.class)
 public abstract class ItemSearchMixin {
 
     @Inject(
-            method = "getTooltip",
+            method = "getTooltipLines",
             at = @At("TAIL")
     )
     private void addEnSearchName(
-            Item.TooltipContext context, @Nullable PlayerEntity player, TooltipType type, CallbackInfoReturnable<List<Text>> cir
+            Item.TooltipContext context, @Nullable Player player, TooltipFlag type, CallbackInfoReturnable<List<Component>> cir
     ) {
         if(!ConfigManager.get().isOn) return;
-        TranslationStorage ts = MultiLanguageCache.get();if(ts == null) return;
+        ClientLanguage ts = MultiLanguageCache.get();if(ts == null) return;
 
         ItemStack itemStack = ((ItemStack)(Object)this);
         Item item = itemStack.getItem();
 
-        String key = item.getTranslationKey();
+        String key = item.getDescriptionId();
 
-        if(!ts.hasTranslation(key)) return;
+        if(!ts.has(key)) return;
 
-        String tooltip_name = ts.get(key);
+        String tooltip_name = ts.getOrDefault(key);
 
         if (tooltip_name != null) {
-            if(itemStack.isOf(Items.ENCHANTED_BOOK)) {
+            if(itemStack.is(Items.ENCHANTED_BOOK)) {
                 if(type.isCreative()) {
-                    ItemEnchantmentsComponent component = EnchantmentHelper.getEnchantments(itemStack);
-                    List<RegistryEntry<Enchantment>> enchantList = component.getEnchantments().stream().toList();
-                    RegistryEntry<Enchantment> entry = enchantList.getFirst();
+                    ItemEnchantments component = EnchantmentHelper.getEnchantmentsForCrafting(itemStack);
+                    List<Holder<Enchantment>> enchantList = component.keySet().stream().toList();
+                    Holder<Enchantment> entry = enchantList.getFirst();
 
-                    if(entry.value().description().getContent() instanceof TranslatableTextContent content) {
-                        if(ts.hasTranslation(content.getKey())) {
-                            tooltip_name = ts.get(content.getKey()) + " " + tooltip_name;
+                    if(entry.value().description().getContents() instanceof TranslatableContents content) {
+                        if(ts.has(content.getKey())) {
+                            tooltip_name = ts.getOrDefault(content.getKey()) + " " + tooltip_name;
                         }
                     }
                 }
             }
-            if(itemStack.isOf(Items.POTION) || itemStack.isOf(Items.LINGERING_POTION) || itemStack.isOf(Items.SPLASH_POTION)) {
-                PotionContentsComponent component = itemStack.get(DataComponentTypes.POTION_CONTENTS);
+            if(itemStack.is(Items.POTION) || itemStack.is(Items.LINGERING_POTION) || itemStack.is(Items.SPLASH_POTION)) {
+                PotionContents component = itemStack.get(DataComponents.POTION_CONTENTS);
                 if(component != null && component.potion().isPresent()) {
-                    RegistryEntry<Potion> entry = component.potion().get();
-                    List<StatusEffectInstance> effects = entry.value().getEffects();
+                    Holder<Potion> entry = component.potion().get();
+                    List<MobEffectInstance> effects = entry.value().getEffects();
 
                     if(!effects.isEmpty()) {
-                        String potion_name_key = effects.getFirst().getTranslationKey();
+                        String potion_name_key = effects.getFirst().getDescriptionId();
 
-                        if(ts.hasTranslation(potion_name_key)) {
-                            tooltip_name = ts.get(potion_name_key) + " " + tooltip_name;
+                        if(ts.has(potion_name_key)) {
+                            tooltip_name = ts.getOrDefault(potion_name_key) + " " + tooltip_name;
                         }
                     }
 
@@ -81,7 +81,7 @@ public abstract class ItemSearchMixin {
             }
 
             cir.getReturnValue().add(
-                    Text.literal(tooltip_name).formatted(Formatting.DARK_GRAY)
+                    Component.literal(tooltip_name).withStyle(ChatFormatting.DARK_GRAY)
             );
         }
     }

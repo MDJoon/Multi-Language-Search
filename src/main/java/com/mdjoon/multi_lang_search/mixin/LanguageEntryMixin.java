@@ -1,27 +1,27 @@
 package com.mdjoon.multi_lang_search.mixin;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(targets = "net.minecraft.client.gui.screen.option.LanguageOptionsScreen$LanguageSelectionListWidget$LanguageEntry")
+@Mixin(targets = "net.minecraft.client.gui.screens.options.LanguageSelectScreen$LanguageSelectionList$Entry")
 public abstract class LanguageEntryMixin {
 
     @Shadow @Final
-    String languageCode;
+    String code;
 
     @ModifyArg(
-            method = "render",
+            method = "extractContent",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/DrawContext;drawCenteredTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/Text;III)V"
+                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;centeredText(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"
             ),
             index = 1
     )
-    private Text adjustLanguageText(Text original) {
-        return Text.literal(original.getString() + " (" + this.languageCode + ")");
+    private Component adjustLanguageText(Component original) {
+        return Component.literal(original.getString() + " (" + this.code + ")");
     }
 }

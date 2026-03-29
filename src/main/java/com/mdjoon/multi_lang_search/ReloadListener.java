@@ -3,13 +3,14 @@ package com.mdjoon.multi_lang_search;
 import com.mdjoon.multi_lang_search.config.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloader;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import org.jspecify.annotations.NonNull;
 
 @Environment(EnvType.CLIENT)
-public class ReloadListener implements SynchronousResourceReloader {
+public class ReloadListener implements ResourceManagerReloadListener {
     @Override
-    public void reload(ResourceManager manager) {
+    public void onResourceManagerReload(@NonNull ResourceManager manager) {
         ConfigManager.load();
         MultiLanguageCache.reload();
     }
